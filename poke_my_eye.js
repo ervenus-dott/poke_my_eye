@@ -15,10 +15,10 @@ var blobProperties = {
         bottomRight: [226, 260],
     },
     eyes: [
-        [165, 139],
-        [201, 234],
-        [126, 226],
-        [68, 136],
+        {pos: [165, 139], hit: false},
+        {pos: [201, 234], hit: false},
+        {pos: [126, 226], hit: false},
+        {pos: [68, 136], hit: false},
     ],
 };
 var drawBlobCoords = function() {
@@ -27,7 +27,7 @@ var drawBlobCoords = function() {
     context.textBaseline = "middle";
     context.textAlign = "center";
     blobProperties.eyes.forEach(function(eye) {
-        context.fillText("X", eye[0], eye[1]);
+        context.fillText("X", eye.pos[0], eye.pos[1]);
     })
     boxWidth = blobProperties.boundingBox.bottomRight[0] - blobProperties.boundingBox.topLeft[0];
     boxHeight = blobProperties.boundingBox.bottomRight[1] - blobProperties.boundingBox.topLeft[1];
@@ -67,10 +67,14 @@ var drawXAtMouse = function(evt) {
     var pos = getMousePos(canvas, evt);
     var mouseVertex = [pos.x, pos.y];
     blobProperties.eyes.forEach(function(eye, eyeIndex) {
-        if(!hitTest(mouseVertex, eye, 20)) {
+        if (
+            eye.hit ||
+            !hitTest(mouseVertex, eye.pos, 20)
+        ) {
             return;
         }
-        console.log('which eye did we click on', eye, eyeIndex);
+        // console.log('which eye did we click on', eye, eyeIndex);
+        eye.hit = true;
         context.fillStyle = "blue";
         context.font = "48px serif";
         context.textBaseline = "middle";
