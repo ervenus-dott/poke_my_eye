@@ -19,12 +19,11 @@ var blobProperties = {
         [201, 234],
         [126, 226],
         [68, 136],
-        [300, 136],
     ],
 };
 var drawBlobCoords = function() {
-    context.fillStyle = "blue";
-    context.font = "48px serif";
+    context.fillStyle = "orange";
+    context.font = "36px serif";
     context.textBaseline = "middle";
     context.textAlign = "center";
     blobProperties.eyes.forEach(function(eye) {
@@ -55,17 +54,33 @@ function getMousePos(canvas, evt) {
         clientY: evt.clientY,
     };
 }
+var vertexDistance = (a, b) => {
+    var x = b[0]- a[0];
+    var y = b[1]- a[1];
+    return Math.sqrt(x * x + y * y);
+};
+var hitTest = function(a, b, radius) {
+    var distance = vertexDistance(a, b);
+    return distance <= radius;
+};
 var drawXAtMouse = function(evt) {
     var pos = getMousePos(canvas, evt);
+    var mouseVertex = [pos.x, pos.y];
+    blobProperties.eyes.forEach(function(eye, eyeIndex) {
+        if(!hitTest(mouseVertex, eye, 20)) {
+            return;
+        }
+        console.log('which eye did we click on', eye, eyeIndex);
+        context.fillStyle = "blue";
+        context.font = "48px serif";
+        context.textBaseline = "middle";
+        context.textAlign = "center";
+        console.log('what is pos.x and pos.y, pos.clientX, pos.clientY', pos.x, pos.y, pos.clientX, pos.clientY);
+        // context.fillText("X",(pos.x -18),(pos.y + 18));
+        context.fillText("X",(pos.x),(pos.y));
+    })
 
-    context.fillStyle = "blue";
-    context.font = "48px serif";
-    context.textBaseline = "middle";
-    context.textAlign = "center";
-    console.log('what is pos.x and pos.y, pos.clientX, pos.clientY', pos.x, pos.y, pos.clientX, pos.clientY);
-    // context.fillText("X",(pos.x -18),(pos.y + 18));
-    context.fillText("X",(pos.x),(pos.y));
-}
+};
 canvas.addEventListener('mousedown' ,drawXAtMouse);
 
 
