@@ -9,34 +9,58 @@ var orangeYellowBlue = document.getElementById("orange-yellow-blue");
 var redBlob = document.getElementById("red-blob");
 
 
-var blobProperties = {
-    boundingBox: {
-        topLeft: [43, 91],
-        bottomRight: [226, 260],
-    },
-    eyes: [
-        {pos: [165, 139], hit: false},
-        {pos: [201, 234], hit: false},
-        {pos: [126, 226], hit: false},
-        {pos: [68, 136], hit: false},
-    ],
-};
-var drawBlobCoords = function() {
+var blobs = [
+    {
+        image: greenNormal,
+        boundingBox: {
+            topLeft: [43, 91],
+            bottomRight: [226, 260],
+        },
+        eyes: [
+            {pos: [165, 139], hit: false},
+            {pos: [201, 234], hit: false},
+            {pos: [126, 226], hit: false},
+            {pos: [68, 136], hit: false},
+        ],
+    },    {
+        image: greenThree,
+        boundingBox: {
+            topLeft: [100, 300],
+            bottomRight: [200, 460],
+        },
+        eyes: [
+            {pos: [165, 139], hit: false},
+            {pos: [201, 234], hit: false},
+            {pos: [126, 226], hit: false},
+            {pos: [68, 136], hit: false},
+        ],
+    }
+];
+var drawBlobCoords = function(blob) {
+    context.drawImage(blob.image, blob.boundingBox.topLeft[0], blob.boundingBox.topLeft[1]);
     context.fillStyle = "orange";
     context.font = "36px serif";
     context.textBaseline = "middle";
     context.textAlign = "center";
-    blobProperties.eyes.forEach(function(eye) {
+    blob.eyes.forEach(function(eye) {
         context.fillText("X", eye.pos[0], eye.pos[1]);
     })
-    boxWidth = blobProperties.boundingBox.bottomRight[0] - blobProperties.boundingBox.topLeft[0];
-    boxHeight = blobProperties.boundingBox.bottomRight[1] - blobProperties.boundingBox.topLeft[1];
-    context.strokeRect(blobProperties.boundingBox.topLeft[0], blobProperties.boundingBox.topLeft[1], boxWidth, boxHeight);
-}
-greenNormal.addEventListener("load", function() {
-    context.drawImage(greenNormal, 21, 71);
+    boxWidth = blob.boundingBox.bottomRight[0] - blob.boundingBox.topLeft[0];
+    boxHeight = blob.boundingBox.bottomRight[1] - blob.boundingBox.topLeft[1];
+    context.strokeRect(blob.boundingBox.topLeft[0], blob.boundingBox.topLeft[1], boxWidth, boxHeight);
+};
+var loadImagePromise = function(image) {
+    return new Promise((resolve) => {
+        image.addEventListener("load", resolve)
+    })
+};
+var imagePromises = blobs.map((blob) => {
+    return loadImagePromise(blob.image);
+});
+Promise.all(imagePromises).then(function() {
     // this is the properties for the 4 eyed green blob
-    drawBlobCoords()
+    // drawBlobCoords(blobs[0])
+    blobs.forEach(drawBlobCoords);
 })
 // context.drawImage(greenThree, 21, 71);
 // context.drawImage(lightBlueMagentaBlue, 21, 71);
@@ -66,23 +90,25 @@ var hitTest = function(a, b, radius) {
 var drawXAtMouse = function(evt) {
     var pos = getMousePos(canvas, evt);
     var mouseVertex = [pos.x, pos.y];
-    blobProperties.eyes.forEach(function(eye, eyeIndex) {
-        if (
-            eye.hit ||
-            !hitTest(mouseVertex, eye.pos, 20)
-        ) {
-            return;
-        }
-        // console.log('which eye did we click on', eye, eyeIndex);
-        eye.hit = true;
-        context.fillStyle = "blue";
-        context.font = "48px serif";
-        context.textBaseline = "middle";
-        context.textAlign = "center";
-        console.log('what is pos.x and pos.y, pos.clientX, pos.clientY', pos.x, pos.y, pos.clientX, pos.clientY);
-        // context.fillText("X",(pos.x -18),(pos.y + 18));
-        context.fillText("X",(pos.x),(pos.y));
-    })
+    blobs.forEach((blob)=>{
+        blob.eyes.forEach(function(eye) {
+            if (
+                eye.hit ||
+                !hitTest(mouseVertex, eye.pos, 20)
+            ) {
+                return;
+            }
+            // console.log('which eye did we click on', eye, eyeIndex);
+            eye.hit = true;
+            context.fillStyle = "blue";
+            context.font = "48px serif";
+            context.textBaseline = "middle";
+            context.textAlign = "center";
+            console.log('what is pos.x and pos.y, pos.clientX, pos.clientY', pos.x, pos.y, pos.clientX, pos.clientY);
+            // context.fillText("X",(pos.x -18),(pos.y + 18));
+            context.fillText("X",(pos.x),(pos.y));
+        });
+    });
 
 };
 canvas.addEventListener('mousedown' ,drawXAtMouse);
