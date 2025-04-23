@@ -13,8 +13,8 @@ var blobs = [
     {
         image: greenNormal,
         boundingBox: {
-            topLeft: [0, 0],
-            bottomRight: [226, 260],
+            topLeft: [200, 300],
+            size: [226, 260],
         },
         eyes: [
             {pos: [146, 72.5250015258789], hit: false},
@@ -25,28 +25,36 @@ var blobs = [
     },    {
         image: greenThree,
         boundingBox: {
-            topLeft: [100, 300],
-            bottomRight: [200, 460],
+            topLeft: [0, 0],
+            size: [200, 176.5250015258789],
         },
         eyes: [
-            {pos: [152, 354.5250015258789], hit: false},
-            {pos: [238, 393.5250015258789], hit: false},
-            {pos: [184, 428.5250015258789], hit: false},
+            {pos: [53, 52.525001525878906], hit: false},
+            {pos: [144, 88.5250015258789], hit: false},
+            {pos: [86, 128.5250015258789], hit: false},
         ],
     }
 ];
 var drawBlobCoords = function(blob) {
-    context.drawImage(blob.image, blob.boundingBox.topLeft[0], blob.boundingBox.topLeft[1]);
+    var topLeftX = blob.boundingBox.topLeft[0];
+    var topLeftY = blob.boundingBox.topLeft[1];
+    var width = blob.boundingBox.size[0];
+    var height = blob.boundingBox.size[1];
+    context.drawImage(blob.image, topLeftX, topLeftY);
     context.fillStyle = "magenta";
     context.font = "36px serif";
     context.textBaseline = "middle";
     context.textAlign = "center";
     blob.eyes.forEach(function(eye) {
-        context.fillText("X", eye.pos[0], eye.pos[1]);
+        context.fillText(
+            "X",
+            topLeftX + eye.pos[0],
+            topLeftY + eye.pos[1],
+        );
     })
-    boxWidth = blob.boundingBox.bottomRight[0] - blob.boundingBox.topLeft[0];
-    boxHeight = blob.boundingBox.bottomRight[1] - blob.boundingBox.topLeft[1];
-    context.strokeRect(blob.boundingBox.topLeft[0], blob.boundingBox.topLeft[1], boxWidth, boxHeight);
+    context.lineWidth = 15;
+    context.strokeStyle = 'red';
+    context.strokeRect(topLeftX, topLeftY, width, height);
 };
 var loadImagePromise = function(image) {
     return new Promise((resolve) => {
