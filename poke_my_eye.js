@@ -13,14 +13,14 @@ var blobs = [
     {
         image: greenNormal,
         boundingBox: {
-            topLeft: [43, 91],
+            topLeft: [0, 0],
             bottomRight: [226, 260],
         },
         eyes: [
-            {pos: [165, 139], hit: false},
-            {pos: [201, 234], hit: false},
-            {pos: [126, 226], hit: false},
-            {pos: [68, 136], hit: false},
+            {pos: [146, 72.5250015258789], hit: false},
+            {pos: [52, 60.525001525878906], hit: false},
+            {pos: [102, 157.5250015258789], hit: false},
+            {pos: [183, 163.5250015258789], hit: false},
         ],
     },    {
         image: greenThree,
@@ -29,16 +29,15 @@ var blobs = [
             bottomRight: [200, 460],
         },
         eyes: [
-            {pos: [165, 139], hit: false},
-            {pos: [201, 234], hit: false},
-            {pos: [126, 226], hit: false},
-            {pos: [68, 136], hit: false},
+            {pos: [152, 354.5250015258789], hit: false},
+            {pos: [238, 393.5250015258789], hit: false},
+            {pos: [184, 428.5250015258789], hit: false},
         ],
     }
 ];
 var drawBlobCoords = function(blob) {
     context.drawImage(blob.image, blob.boundingBox.topLeft[0], blob.boundingBox.topLeft[1]);
-    context.fillStyle = "orange";
+    context.fillStyle = "magenta";
     context.font = "36px serif";
     context.textBaseline = "middle";
     context.textAlign = "center";
@@ -94,6 +93,7 @@ var hitTest = function(a, b, radius) {
 var drawXAtMouse = function(evt) {
     var pos = getMousePos(canvas, evt);
     var mouseVertex = [pos.x, pos.y];
+    console.log('what is pos.x and pos.y', pos.x, pos.y);
     blobs.forEach((blob)=>{
         blob.eyes.forEach(function(eye) {
             if (
@@ -108,7 +108,6 @@ var drawXAtMouse = function(evt) {
             context.font = "48px serif";
             context.textBaseline = "middle";
             context.textAlign = "center";
-            console.log('what is pos.x and pos.y, pos.clientX, pos.clientY', pos.x, pos.y, pos.clientX, pos.clientY);
             // context.fillText("X",(pos.x -18),(pos.y + 18));
             context.fillText("X",(pos.x),(pos.y));
         });
