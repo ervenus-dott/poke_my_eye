@@ -51,7 +51,11 @@ var drawBlobCoords = function(blob) {
 };
 var loadImagePromise = function(image) {
     return new Promise((resolve) => {
-        image.addEventListener("load", resolve)
+        if (image.complete) {
+            resolve();
+        } else {
+            image.addEventListener("load", resolve)
+        }
     })
 };
 var imagePromises = blobs.map((blob) => {
