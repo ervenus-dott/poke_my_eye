@@ -13,8 +13,8 @@ var blobs = [
     {
         image: greenNormal,
         boundingBox: {
-            topLeft: [200, 300],
-            size: [226, 260],
+            topLeft: [400, 0],
+            size: [226, 206.5250015258789],
         },
         eyes: [
             {pos: [146, 72.5250015258789], hit: false},
@@ -25,13 +25,25 @@ var blobs = [
     },    {
         image: greenThree,
         boundingBox: {
-            topLeft: [0, 0],
+            topLeft: [200, 300],
             size: [200, 176.5250015258789],
         },
         eyes: [
             {pos: [53, 52.525001525878906], hit: false},
             {pos: [144, 88.5250015258789], hit: false},
             {pos: [86, 128.5250015258789], hit: false},
+        ],
+    },{
+        image: lightBlueMagentaBlue,
+        boundingBox: {
+            topLeft: [0, 0],
+            size: [314, 382.5250015258789],
+        },
+        eyes: [
+            {pos: [52, 132.5250015258789], hit: false},
+            {pos: [207, 130.5250015258789], hit: false},
+            {pos: [160, 306.5250015258789], hit: false},
+            {pos: [67, 224.5250015258789], hit: false},
         ],
     }
 ];
@@ -98,6 +110,9 @@ var hitTest = function(a, b, radius) {
     var distance = vertexDistance(a, b);
     return distance <= radius;
 };
+
+// TODO: fix the eye clicking so that it works for multiple blobs.
+// Current version seems to only work with a single blob.
 var drawXAtMouse = function(evt) {
     var pos = getMousePos(canvas, evt);
     var mouseVertex = [pos.x, pos.y];
