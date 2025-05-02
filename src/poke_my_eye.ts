@@ -21,6 +21,7 @@ type Eye = {
 type Blawb = {
   image: number
   phase: number
+  speed: number
   topLeftCorner: Vec2
   dimensions: Vec2
   eyes: Eye[]
@@ -30,6 +31,7 @@ const blobSources: Blawb[] = [
   {
     image: 0,
     phase: 0,
+    speed: 0,
     topLeftCorner: [0, 0],
     dimensions: [226, 206.5250015258789],
     eyes: [
@@ -42,6 +44,7 @@ const blobSources: Blawb[] = [
   {
     image: 1,
     phase: 0,
+    speed: 0,
     topLeftCorner: [0, 0],
     dimensions: [200, 176.5250015258789],
     eyes: [
@@ -53,6 +56,7 @@ const blobSources: Blawb[] = [
   {
     image: 2,
     phase: 0,
+    speed: 0,
     topLeftCorner: [0, 0],
     dimensions: [314, 382.5250015258789],
     eyes: [
@@ -70,6 +74,7 @@ const makeRandomBlob = (): void => {
   const sourceBlob = blobSources[index]
   const clonedBlob = jsonClone(sourceBlob) as Blawb
   clonedBlob.phase = Math.random() * Math.PI * 2
+  clonedBlob.speed = Math.random() * 2 - 1
   clonedBlob.topLeftCorner[0] = Math.random() * (canvas.width - clonedBlob.dimensions[0])
   clonedBlob.topLeftCorner[1] = Math.random() * (canvas.height - clonedBlob.dimensions[1])
   blobs.push(clonedBlob)
@@ -118,7 +123,7 @@ const renderLoop = (time: number): void => {
   context.clearRect(0, 0, canvas.width, canvas.height)
   blobs = blobs.filter(isBlobAlive)
   blobs.forEach((blob) => {
-    const blobPhase = phase + blob.phase * 2
+    const blobPhase = (phase + blob.phase) * blob.speed
     blob.topLeftCorner[0] += Math.cos(blobPhase)
     blob.topLeftCorner[1] += Math.sin(blobPhase)
   })
