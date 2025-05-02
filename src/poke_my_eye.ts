@@ -65,11 +65,11 @@ const drawBlobCoords = function (blob: Blawb) {
   const width = blob.dimensions[0]
   const height = blob.dimensions[1]
   context.drawImage(blob.image, topLeftX, topLeftY)
-  context.fillStyle = 'magenta'
   context.font = '36px serif'
   context.textBaseline = 'middle'
   context.textAlign = 'center'
   blob.eyes.forEach(function (eye) {
+    context.fillStyle = eye.hit ? 'blue' : 'magenta'
     context.fillText('X', topLeftX + eye.pos[0], topLeftY + eye.pos[1])
   })
   context.lineWidth = 15
