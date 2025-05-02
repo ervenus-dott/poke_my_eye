@@ -90,10 +90,20 @@ const loadImagePromise = function (image: HTMLImageElement) {
 const imagePromises = blobs.map((blob) => {
   return loadImagePromise(blob.image)
 })
-Promise.all(imagePromises).then(function () {
-  // this is the properties for the 4 eyed green blob
-  // drawBlobCoords(blobs[0])
+let lastTime = 0
+let phase = 0
+const renderLoop = (time: number): void => {
+  const delta = (lastTime - time) / 1000
+  phase += delta
+  requestAnimationFrame(renderLoop)
+  context.clearRect(0, 0, canvas.width, canvas.height)
+  blobs[0].topLeftCorner[0] += Math.cos(phase * 2)
+  blobs[0].topLeftCorner[1] += Math.sin(phase * 2)
   blobs.forEach(drawBlobCoords)
+  lastTime = time
+}
+Promise.all(imagePromises).then(function () {
+  requestAnimationFrame(renderLoop)
 })
 // context.drawImage(greenThree, 21, 71);
 // context.drawImage(lightBlueMagentaBlue, 21, 71);
