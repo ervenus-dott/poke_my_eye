@@ -111,6 +111,9 @@ function getMousePos(canvas: HTMLCanvasElement, evt: MouseEvent) {
     clientY: evt.clientY,
   }
 }
+const vertexAdd = (a: Vec2, b: Vec2): Vec2 => {
+  return [a[0] + b[0], a[1] + b[1]]
+}
 const vertexDistance = (a: Vec2, b: Vec2): number => {
   const x = b[0] - a[0]
   const y = b[1] - a[1]
@@ -129,7 +132,8 @@ const drawXAtMouse = function (evt: MouseEvent) {
   console.log('what is pos.x and pos.y', pos.x, pos.y)
   blobs.forEach((blob) => {
     blob.eyes.forEach(function (eye) {
-      if (eye.hit || !hitTest(mouseVertex, eye.pos, 20)) {
+      const eyePosition = vertexAdd(blob.topLeftCorner, eye.pos)
+      if (eye.hit || !hitTest(mouseVertex, eyePosition, 20)) {
         return
       }
       // console.log('which eye did we click on', eye, eyeIndex);
