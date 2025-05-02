@@ -10,7 +10,6 @@ const orangeMagentaBlue = document.getElementById("orange-magenta-blue") as HTML
 const orangeYellowBlue = document.getElementById("orange-yellow-blue") as HTMLImageElement;
 const redBlob = document.getElementById("red-blob") as HTMLImageElement;
 */
-
 type Vec2 = [number, number]
 
 type Eye = {
@@ -27,6 +26,7 @@ type Blawb = {
   eyes: Eye[]
 }
 const images: HTMLImageElement[] = [greenNormal, greenThree, lightBlueMagentaBlue]
+//TODO: Add more blob sources!
 const blobSources: Blawb[] = [
   {
     image: 0,
@@ -162,8 +162,6 @@ const hitTest = function (a: Vec2, b: Vec2, radius: number) {
   return distance <= radius
 }
 
-// TODO: fix the eye clicking so that it works for multiple blobs.
-// Current version seems to only work with a single blob.
 const drawXAtMouse = function (evt: MouseEvent) {
   const pos = getMousePos(canvas, evt)
   const mouseVertex: Vec2 = [pos.x, pos.y]
