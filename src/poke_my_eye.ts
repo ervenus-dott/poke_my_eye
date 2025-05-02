@@ -25,7 +25,7 @@ type Blawb = {
   eyes: Eye[]
 }
 
-const blobs: Blawb[] = [
+let blobs: Blawb[] = [
   {
     image: greenNormal,
     topLeftCorner: [400, 0],
@@ -90,6 +90,9 @@ const loadImagePromise = function (image: HTMLImageElement) {
 const imagePromises = blobs.map((blob) => {
   return loadImagePromise(blob.image)
 })
+const isEyeHit = (eye: Eye) => eye.hit
+const isBlobAlive = (blob: Blawb) => !blob.eyes.every(isEyeHit)
+
 let lastTime = 0
 let phase = 0
 const renderLoop = (time: number): void => {
@@ -97,6 +100,7 @@ const renderLoop = (time: number): void => {
   phase += delta
   requestAnimationFrame(renderLoop)
   context.clearRect(0, 0, canvas.width, canvas.height)
+  blobs = blobs.filter(isBlobAlive)
   blobs.forEach((blob, index: number) => {
     const phaseOffset = index * 2
     const blobPhase = phase + phaseOffset * 2
