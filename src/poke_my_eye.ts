@@ -19,16 +19,18 @@ type Eye = {
 }
 
 type Blawb = {
-  image: HTMLImageElement
+  image: number
+  phase: number
   topLeftCorner: Vec2
   dimensions: Vec2
   eyes: Eye[]
 }
-
-let blobs: Blawb[] = [
+const images: HTMLImageElement[] = [greenNormal, greenThree, lightBlueMagentaBlue]
+const blobSources: Blawb[] = [
   {
-    image: greenNormal,
-    topLeftCorner: [400, 0],
+    image: 0,
+    phase: 0,
+    topLeftCorner: [0, 0],
     dimensions: [226, 206.5250015258789],
     eyes: [
       { pos: [146, 72.5250015258789], hit: false },
@@ -38,8 +40,9 @@ let blobs: Blawb[] = [
     ],
   },
   {
-    image: greenThree,
-    topLeftCorner: [200, 300],
+    image: 1,
+    phase: 0,
+    topLeftCorner: [0, 0],
     dimensions: [200, 176.5250015258789],
     eyes: [
       { pos: [53, 52.525001525878906], hit: false },
@@ -48,7 +51,8 @@ let blobs: Blawb[] = [
     ],
   },
   {
-    image: lightBlueMagentaBlue,
+    image: 2,
+    phase: 0,
     topLeftCorner: [0, 0],
     dimensions: [314, 382.5250015258789],
     eyes: [
@@ -59,12 +63,26 @@ let blobs: Blawb[] = [
     ],
   },
 ]
+const jsonClone = (src: object): object => JSON.parse(JSON.stringify(src))
+let blobs: Blawb[] = []
+const makeRandomBlob = (): void => {
+  const index = Math.floor(Math.random() * blobSources.length)
+  const sourceBlob = blobSources[index]
+  const clonedBlob = jsonClone(sourceBlob) as Blawb
+  clonedBlob.phase = Math.random() * Math.PI * 2
+  clonedBlob.topLeftCorner[0] = Math.random() * (canvas.width - clonedBlob.dimensions[0])
+  clonedBlob.topLeftCorner[1] = Math.random() * (canvas.height - clonedBlob.dimensions[1])
+  blobs.push(clonedBlob)
+}
+makeRandomBlob()
+setInterval(makeRandomBlob, 5000)
 const drawBlobCoords = function (blob: Blawb) {
   const topLeftX = blob.topLeftCorner[0]
   const topLeftY = blob.topLeftCorner[1]
   const width = blob.dimensions[0]
   const height = blob.dimensions[1]
-  context.drawImage(blob.image, topLeftX, topLeftY)
+  const image = images[blob.image]
+  context.drawImage(image, topLeftX, topLeftY)
   context.font = '36px serif'
   context.textBaseline = 'middle'
   context.textAlign = 'center'
@@ -87,9 +105,7 @@ const loadImagePromise = function (image: HTMLImageElement) {
     }
   })
 }
-const imagePromises = blobs.map((blob) => {
-  return loadImagePromise(blob.image)
-})
+const imagePromises = images.map(loadImagePromise)
 const isEyeHit = (eye: Eye) => eye.hit
 const isBlobAlive = (blob: Blawb) => !blob.eyes.every(isEyeHit)
 
@@ -101,9 +117,8 @@ const renderLoop = (time: number): void => {
   requestAnimationFrame(renderLoop)
   context.clearRect(0, 0, canvas.width, canvas.height)
   blobs = blobs.filter(isBlobAlive)
-  blobs.forEach((blob, index: number) => {
-    const phaseOffset = index * 2
-    const blobPhase = phase + phaseOffset * 2
+  blobs.forEach((blob) => {
+    const blobPhase = phase + blob.phase * 2
     blob.topLeftCorner[0] += Math.cos(blobPhase)
     blob.topLeftCorner[1] += Math.sin(blobPhase)
   })
