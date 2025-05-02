@@ -97,8 +97,12 @@ const renderLoop = (time: number): void => {
   phase += delta
   requestAnimationFrame(renderLoop)
   context.clearRect(0, 0, canvas.width, canvas.height)
-  blobs[0].topLeftCorner[0] += Math.cos(phase * 2)
-  blobs[0].topLeftCorner[1] += Math.sin(phase * 2)
+  blobs.forEach((blob, index: number) => {
+    const phaseOffset = index * 2
+    const blobPhase = phase + phaseOffset * 2
+    blob.topLeftCorner[0] += Math.cos(blobPhase)
+    blob.topLeftCorner[1] += Math.sin(blobPhase)
+  })
   blobs.forEach(drawBlobCoords)
   lastTime = time
 }
