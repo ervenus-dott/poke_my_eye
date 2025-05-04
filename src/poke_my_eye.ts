@@ -4,20 +4,19 @@ const context = canvas.getContext('2d') as CanvasRenderingContext2D
 const greenNormal = document.getElementById('green-normal') as HTMLImageElement
 const greenThree = document.getElementById('green-3') as HTMLImageElement
 const lightBlueMagentaBlue = document.getElementById('light-blue-magenta-blue') as HTMLImageElement
-/*
-const lightBlueYellowBlue = document.getElementById("light-blue-yellow-blue") as HTMLImageElement;
-const orangeMagentaBlue = document.getElementById("orange-magenta-blue") as HTMLImageElement;
-const orangeYellowBlue = document.getElementById("orange-yellow-blue") as HTMLImageElement;
-const redBlob = document.getElementById("red-blob") as HTMLImageElement;
-*/
-type Vec2 = [number, number]
+const lightBlueYellowBlue = document.getElementById('light-blue-yellow-blue') as HTMLImageElement
+const orangeMagentaBlue = document.getElementById('orange-magenta-blue') as HTMLImageElement
+const orangeYellowBlue = document.getElementById('orange-yellow-blue') as HTMLImageElement
+const redBlob = document.getElementById('red-blob') as HTMLImageElement
 
+type Vec2 = [number, number]
 type Eye = {
   pos: Vec2
   hit: boolean
 }
 
 type Blawb = {
+  name: string
   image: number
   phase: number
   speed: number
@@ -25,10 +24,19 @@ type Blawb = {
   dimensions: Vec2
   eyes: Eye[]
 }
-const images: HTMLImageElement[] = [greenNormal, greenThree, lightBlueMagentaBlue]
-//TODO: Add more blob sources!
+
+const images: HTMLImageElement[] = [
+  greenNormal,
+  greenThree,
+  lightBlueMagentaBlue,
+  lightBlueYellowBlue,
+  orangeMagentaBlue,
+  orangeYellowBlue,
+  redBlob,
+]
 const blobSources: Blawb[] = [
   {
+    name: 'greenNormal',
     image: 0,
     phase: 0,
     speed: 0,
@@ -42,6 +50,7 @@ const blobSources: Blawb[] = [
     ],
   },
   {
+    name: 'greenThree',
     image: 1,
     phase: 0,
     speed: 0,
@@ -54,6 +63,7 @@ const blobSources: Blawb[] = [
     ],
   },
   {
+    name: 'lightBlueMagentaBlue',
     image: 2,
     phase: 0,
     speed: 0,
@@ -66,7 +76,70 @@ const blobSources: Blawb[] = [
       { pos: [67, 224.5250015258789], hit: false },
     ],
   },
+  {
+    name: 'lightBlueYellowBlue',
+    image: 3,
+    phase: 0,
+    speed: 0,
+    topLeftCorner: [0, 0],
+    dimensions: [391, 308.1666717529297],
+    eyes: [
+      { pos: [104, 151.1666717529297], hit: false },
+      { pos: [275, 138.1666717529297], hit: false },
+      { pos: [200, 243.1666717529297], hit: false },
+      { pos: [69, 205.1666717529297], hit: false },
+    ],
+  },
+  {
+    name: 'orangeMagentaBlue',
+    image: 4,
+    phase: 0,
+    speed: 0,
+    topLeftCorner: [0, 0],
+    dimensions: [284, 259.1666717529297],
+    eyes: [
+      { pos: [77, 81.16667175292969], hit: false },
+      { pos: [223, 68.16667175292969], hit: false },
+      { pos: [192, 147.1666717529297], hit: false },
+      { pos: [81, 215.1666717529297], hit: false },
+    ],
+  },
+  {
+    name: 'orangeYellowBlue',
+    image: 5,
+    phase: 0,
+    speed: 0,
+    topLeftCorner: [0, 0],
+    dimensions: [350, 327.1666717529297],
+    eyes: [
+      { pos: [234, 98.16667175292969], hit: false },
+      { pos: [278, 224.1666717529297], hit: false },
+      { pos: [135, 262.1666717529297], hit: false },
+      { pos: [82, 157.1666717529297], hit: false },
+    ],
+  },
+  {
+    name: 'redBlob',
+    image: 6,
+    phase: 0,
+    speed: 0,
+    topLeftCorner: [0, 0],
+    dimensions: [246, 130.1666717529297],
+    eyes: [
+      { pos: [90, 47.16667175292969], hit: false },
+      { pos: [184, 43.16667175292969], hit: false },
+      { pos: [160, 86.16667175292969], hit: false },
+      { pos: [57, 93.16667175292969], hit: false },
+    ],
+  },
 ]
+const drawImageForDimensionTesting = (width: number, height: number) => {
+  context.drawImage(redBlob, 0, 0)
+  context.lineWidth = 15
+  context.strokeStyle = 'red'
+  context.strokeRect(0, 0, width, height)
+}
+drawImageForDimensionTesting(246, 130.1666717529297)
 const jsonClone = (src: object): object => JSON.parse(JSON.stringify(src))
 let blobs: Blawb[] = []
 const makeRandomBlob = (): void => {
@@ -93,7 +166,7 @@ const drawBlobCoords = function (blob: Blawb) {
   context.textAlign = 'center'
   blob.eyes.forEach(function (eye) {
     context.fillStyle = eye.hit ? 'blue' : 'magenta'
-    context.fillText('X', topLeftX + eye.pos[0], topLeftY + eye.pos[1])
+    context.fillText('o', topLeftX + eye.pos[0], topLeftY + eye.pos[1])
   })
   context.lineWidth = 15
   context.strokeStyle = 'red'
@@ -133,12 +206,6 @@ const renderLoop = (time: number): void => {
 Promise.all(imagePromises).then(function () {
   requestAnimationFrame(renderLoop)
 })
-// context.drawImage(greenThree, 21, 71);
-// context.drawImage(lightBlueMagentaBlue, 21, 71);
-// context.drawImage(lightBlueYellowBlue, 21, 71);
-// context.drawImage(orangeMagentaBlue, 21, 71);
-// context.drawImage(orangeYellowBlue, 21, 71);
-// context.drawImage(redBlob, 21, 71);
 
 function getMousePos(canvas: HTMLCanvasElement, evt: MouseEvent) {
   const rect = canvas.getBoundingClientRect()
@@ -165,7 +232,7 @@ const hitTest = function (a: Vec2, b: Vec2, radius: number) {
 const drawXAtMouse = function (evt: MouseEvent) {
   const pos = getMousePos(canvas, evt)
   const mouseVertex: Vec2 = [pos.x, pos.y]
-  console.log('what is pos.x and pos.y', pos.x, pos.y)
+  console.log('what is pos.x and pos.y', pos.x, ',', pos.y)
   blobs.forEach((blob) => {
     blob.eyes.forEach(function (eye) {
       const eyePosition = vertexAdd(blob.topLeftCorner, eye.pos)
