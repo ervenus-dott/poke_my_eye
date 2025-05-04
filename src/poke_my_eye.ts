@@ -157,8 +157,8 @@ setInterval(makeRandomBlob, 5000)
 const drawBlobCoords = function (blob: Blawb) {
   const topLeftX = blob.topLeftCorner[0]
   const topLeftY = blob.topLeftCorner[1]
-  const width = blob.dimensions[0]
-  const height = blob.dimensions[1]
+  // const width = blob.dimensions[0]
+  // const height = blob.dimensions[1]
   const image = images[blob.image]
   context.drawImage(image, topLeftX, topLeftY)
   context.font = '36px serif'
@@ -166,11 +166,11 @@ const drawBlobCoords = function (blob: Blawb) {
   context.textAlign = 'center'
   blob.eyes.forEach(function (eye) {
     context.fillStyle = eye.hit ? 'blue' : 'magenta'
-    context.fillText('o', topLeftX + eye.pos[0], topLeftY + eye.pos[1])
+    context.fillText(eye.hit ? 'x' : 'o', topLeftX + eye.pos[0], topLeftY + eye.pos[1])
   })
-  context.lineWidth = 15
-  context.strokeStyle = 'red'
-  context.strokeRect(topLeftX, topLeftY, width, height)
+  // context.lineWidth = 15
+  // context.strokeStyle = 'red'
+  // context.strokeRect(topLeftX, topLeftY, width, height)
 }
 const loadImagePromise = function (image: HTMLImageElement) {
   return new Promise<void>((resolve) => {
