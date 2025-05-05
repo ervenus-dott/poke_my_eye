@@ -244,12 +244,6 @@ const drawXAtMouse = function (evt: MouseEvent) {
       }
       // console.log('which eye did we click on', eye, eyeIndex);
       eye.hit = true
-      context.fillStyle = 'blue'
-      context.font = '48px serif'
-      context.textBaseline = 'middle'
-      context.textAlign = 'center'
-      // context.fillText("X",(pos.x -18),(pos.y + 18));
-      context.fillText('X', pos.x, pos.y)
     })
   })
 }
