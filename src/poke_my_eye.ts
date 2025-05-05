@@ -8,6 +8,7 @@ const lightBlueYellowBlue = document.getElementById('light-blue-yellow-blue') as
 const orangeMagentaBlue = document.getElementById('orange-magenta-blue') as HTMLImageElement
 const orangeYellowBlue = document.getElementById('orange-yellow-blue') as HTMLImageElement
 const redBlob = document.getElementById('red-blob') as HTMLImageElement
+const blobCounterText = document.getElementById('blob-count') as HTMLElement
 
 type Vec2 = [number, number]
 type Eye = {
@@ -134,13 +135,18 @@ const blobSources: Blawb[] = [
   },
 ]
 let blobCount: number = 0
+const updateBlobText = function () {
+  blobCounterText.innerText = blobCount + ' blobs'
+}
 const blobCounter = (blobBoolean: boolean) => {
   if (blobBoolean) {
     blobCount += 1
-    console.log('what is blobCount', blobCount)
+    updateBlobText()
+    // console.log('what is blobCount', blobCount)
   } else {
     blobCount -= 1
-    console.log('what is blobCount', blobCount)
+    updateBlobText()
+    // console.log('what is blobCount', blobCount)
   }
 }
 /*const drawImageForDimensionTesting = (width: number, height: number) => {
@@ -164,7 +170,7 @@ const makeRandomBlob = (): void => {
   blobCounter(true)
 }
 makeRandomBlob()
-setInterval(makeRandomBlob, 1500)
+setInterval(makeRandomBlob, 5000)
 const drawBlobCoords = function (blob: Blawb) {
   const topLeftX = blob.topLeftCorner[0]
   const topLeftY = blob.topLeftCorner[1]
