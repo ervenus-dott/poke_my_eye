@@ -133,13 +133,14 @@ const blobSources: Blawb[] = [
     ],
   },
 ]
-const drawImageForDimensionTesting = (width: number, height: number) => {
+let blobCount: number = 0
+/*const drawImageForDimensionTesting = (width: number, height: number) => {
   context.drawImage(redBlob, 0, 0)
   context.lineWidth = 15
   context.strokeStyle = 'red'
   context.strokeRect(0, 0, width, height)
 }
-drawImageForDimensionTesting(246, 130.1666717529297)
+drawImageForDimensionTesting(246, 130.1666717529297)*/
 const jsonClone = (src: object): object => JSON.parse(JSON.stringify(src))
 let blobs: Blawb[] = []
 const makeRandomBlob = (): void => {
@@ -151,6 +152,8 @@ const makeRandomBlob = (): void => {
   clonedBlob.topLeftCorner[0] = Math.random() * (canvas.width - clonedBlob.dimensions[0])
   clonedBlob.topLeftCorner[1] = Math.random() * (canvas.height - clonedBlob.dimensions[1])
   blobs.push(clonedBlob)
+  blobCount += 1
+  console.log('what is blobCount', blobCount)
 }
 makeRandomBlob()
 setInterval(makeRandomBlob, 5000)
