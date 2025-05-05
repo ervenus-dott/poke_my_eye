@@ -134,6 +134,15 @@ const blobSources: Blawb[] = [
   },
 ]
 let blobCount: number = 0
+const blobCounter = (blobBoolean: boolean) => {
+  if (blobBoolean) {
+    blobCount += 1
+    console.log('what is blobCount', blobCount)
+  } else {
+    blobCount -= 1
+    console.log('what is blobCount', blobCount)
+  }
+}
 /*const drawImageForDimensionTesting = (width: number, height: number) => {
   context.drawImage(redBlob, 0, 0)
   context.lineWidth = 15
@@ -152,11 +161,10 @@ const makeRandomBlob = (): void => {
   clonedBlob.topLeftCorner[0] = Math.random() * (canvas.width - clonedBlob.dimensions[0])
   clonedBlob.topLeftCorner[1] = Math.random() * (canvas.height - clonedBlob.dimensions[1])
   blobs.push(clonedBlob)
-  blobCount += 1
-  console.log('what is blobCount', blobCount)
+  blobCounter(true)
 }
 makeRandomBlob()
-setInterval(makeRandomBlob, 5000)
+setInterval(makeRandomBlob, 1500)
 const drawBlobCoords = function (blob: Blawb) {
   const topLeftX = blob.topLeftCorner[0]
   const topLeftY = blob.topLeftCorner[1]
@@ -198,6 +206,9 @@ const renderLoop = (time: number): void => {
   requestAnimationFrame(renderLoop)
   context.clearRect(0, 0, canvas.width, canvas.height)
   blobs = blobs.filter(isBlobAlive)
+  if (blobCount > blobs.length) {
+    blobCounter(false)
+  }
   blobs.forEach((blob) => {
     const blobPhase = (phase + blob.phase) * blob.speed
     blob.topLeftCorner[0] += Math.cos(blobPhase)
@@ -235,7 +246,7 @@ const hitTest = function (a: Vec2, b: Vec2, radius: number) {
 const drawXAtMouse = function (evt: MouseEvent) {
   const pos = getMousePos(canvas, evt)
   const mouseVertex: Vec2 = [pos.x, pos.y]
-  console.log('what is pos.x and pos.y', pos.x, ',', pos.y)
+  // console.log('what is pos.x and pos.y', pos.x, ',', pos.y)
   blobs.forEach((blob) => {
     blob.eyes.forEach(function (eye) {
       const eyePosition = vertexAdd(blob.topLeftCorner, eye.pos)
