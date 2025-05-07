@@ -9,6 +9,7 @@ const orangeMagentaBlue = document.getElementById('orange-magenta-blue') as HTML
 const orangeYellowBlue = document.getElementById('orange-yellow-blue') as HTMLImageElement
 const redBlob = document.getElementById('red-blob') as HTMLImageElement
 const blobCounterText = document.getElementById('blob-count') as HTMLElement
+const scoreText = document.getElementById('score') as HTMLElement
 
 type Vec2 = [number, number]
 type Eye = {
@@ -135,8 +136,12 @@ const blobSources: Blawb[] = [
   },
 ]
 let blobCount: number = 0
+let score: number = 0
 const updateBlobText = function () {
   blobCounterText.innerText = blobCount + ' blobs'
+}
+const updateScoreText = function () {
+  scoreText.innerText = 'score is: ' + score
 }
 const blobCounter = (blobBoolean: boolean) => {
   if (blobBoolean) {
@@ -146,7 +151,10 @@ const blobCounter = (blobBoolean: boolean) => {
   } else {
     blobCount -= 1
     updateBlobText()
+    score += Math.ceil(Math.random() * 60 + 20)
+    updateScoreText()
     // console.log('what is blobCount', blobCount)
+    // console.log('what is score', score)
   }
 }
 /*const drawImageForDimensionTesting = (width: number, height: number) => {
