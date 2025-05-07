@@ -20,8 +20,7 @@ type Eye = {
 type Blawb = {
   name: string
   image: number
-  phase: number
-  speed: number
+  velocity: Vec2
   topLeftCorner: Vec2
   dimensions: Vec2
   eyes: Eye[]
@@ -40,8 +39,7 @@ const blobSources: Blawb[] = [
   {
     name: 'greenNormal',
     image: 0,
-    phase: 0,
-    speed: 0,
+    velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [226, 206.5250015258789],
     eyes: [
@@ -54,8 +52,7 @@ const blobSources: Blawb[] = [
   {
     name: 'greenThree',
     image: 1,
-    phase: 0,
-    speed: 0,
+    velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [200, 176.5250015258789],
     eyes: [
@@ -67,8 +64,7 @@ const blobSources: Blawb[] = [
   {
     name: 'lightBlueMagentaBlue',
     image: 2,
-    phase: 0,
-    speed: 0,
+    velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [314, 382.5250015258789],
     eyes: [
@@ -81,8 +77,7 @@ const blobSources: Blawb[] = [
   {
     name: 'lightBlueYellowBlue',
     image: 3,
-    phase: 0,
-    speed: 0,
+    velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [391, 308.1666717529297],
     eyes: [
@@ -95,8 +90,7 @@ const blobSources: Blawb[] = [
   {
     name: 'orangeMagentaBlue',
     image: 4,
-    phase: 0,
-    speed: 0,
+    velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [284, 259.1666717529297],
     eyes: [
@@ -109,8 +103,7 @@ const blobSources: Blawb[] = [
   {
     name: 'orangeYellowBlue',
     image: 5,
-    phase: 0,
-    speed: 0,
+    velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [350, 327.1666717529297],
     eyes: [
@@ -123,8 +116,7 @@ const blobSources: Blawb[] = [
   {
     name: 'redBlob',
     image: 6,
-    phase: 0,
-    speed: 0,
+    velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [246, 130.1666717529297],
     eyes: [
@@ -170,14 +162,13 @@ const makeRandomBlob = (): void => {
   const index = Math.floor(Math.random() * blobSources.length)
   const sourceBlob = blobSources[index]
   const clonedBlob = jsonClone(sourceBlob) as Blawb
-  clonedBlob.phase = Math.random() * Math.PI * 2
-  clonedBlob.speed = Math.random() * 2 - 1
+  clonedBlob.velocity = vertexScale([Math.random() * 2 - 1, Math.random() * 2 - 1], 100)
   clonedBlob.topLeftCorner[0] = Math.random() * (canvas.width - clonedBlob.dimensions[0])
   clonedBlob.topLeftCorner[1] = Math.random() * (canvas.height - clonedBlob.dimensions[1])
   blobs.push(clonedBlob)
   blobCounter(true)
 }
-makeRandomBlob()
+
 setInterval(makeRandomBlob, 5000)
 const drawBlobCoords = function (blob: Blawb) {
   const topLeftX = blob.topLeftCorner[0]
@@ -213,10 +204,8 @@ const isEyeHit = (eye: Eye) => eye.hit
 const isBlobAlive = (blob: Blawb) => !blob.eyes.every(isEyeHit)
 
 let lastTime = 0
-let phase = 0
 const renderLoop = (time: number): void => {
   const delta = (lastTime - time) / 1000
-  phase += delta
   requestAnimationFrame(renderLoop)
   context.clearRect(0, 0, canvas.width, canvas.height)
   blobs = blobs.filter(isBlobAlive)
@@ -224,14 +213,14 @@ const renderLoop = (time: number): void => {
     blobCounter(false)
   }
   blobs.forEach((blob) => {
-    const blobPhase = (phase + blob.phase) * blob.speed
-    blob.topLeftCorner[0] += Math.cos(blobPhase)
-    blob.topLeftCorner[1] += Math.sin(blobPhase)
+    // const blobPhase = (phase + blob.phase) * blob.speed
+    bounce(blob, delta)
   })
   blobs.forEach(drawBlobCoords)
   lastTime = time
 }
 Promise.all(imagePromises).then(function () {
+  makeRandomBlob()
   requestAnimationFrame(renderLoop)
 })
 
@@ -247,10 +236,24 @@ function getMousePos(canvas: HTMLCanvasElement, evt: MouseEvent) {
 const vertexAdd = (a: Vec2, b: Vec2): Vec2 => {
   return [a[0] + b[0], a[1] + b[1]]
 }
+const vertexScale = (a: Vec2, scale: number): Vec2 => {
+  return [a[0] * scale, a[1] * scale]
+}
 const vertexDistance = (a: Vec2, b: Vec2): number => {
   const x = b[0] - a[0]
   const y = b[1] - a[1]
   return Math.sqrt(x * x + y * y)
+}
+const bounce = (blob: Blawb, delta: number) => {
+  const velocityDelta = vertexScale(blob.velocity, delta)
+  blob.topLeftCorner = vertexAdd(blob.topLeftCorner, velocityDelta)
+  const bottomRight = vertexAdd(blob.topLeftCorner, blob.dimensions)
+  if (blob.topLeftCorner[0] < 0 || bottomRight[0] > canvas.width) {
+    blob.velocity[0] *= -1
+  }
+  if (blob.topLeftCorner[1] < 0 || bottomRight[1] > canvas.height) {
+    blob.velocity[1] *= -1
+  }
 }
 const hitTest = function (a: Vec2, b: Vec2, radius: number) {
   const distance = vertexDistance(a, b)
