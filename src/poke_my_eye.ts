@@ -7,7 +7,7 @@ const scoreText = document.getElementById('score') as HTMLElement
 type Vec2 = [number, number]
 type Eye = {
   pos: Vec2
-  hit: boolean
+  hitFrame: number
 }
 type Blawb = {
   name: string
@@ -28,10 +28,10 @@ const blobSources: Blawb[] = [
     topLeftCorner: [0, 0],
     dimensions: [226, 206.5250015258789],
     eyes: [
-      { pos: [52, 60.525001525878906], hit: false },
-      { pos: [146, 72.5250015258789], hit: false },
-      { pos: [183, 163.5250015258789], hit: false },
-      { pos: [102, 157.5250015258789], hit: false },
+      { pos: [52, 60.525001525878906], hitFrame: 0 },
+      { pos: [146, 72.5250015258789], hitFrame: 0 },
+      { pos: [183, 163.5250015258789], hitFrame: 0 },
+      { pos: [102, 157.5250015258789], hitFrame: 0 },
     ],
   },
   {
@@ -41,9 +41,9 @@ const blobSources: Blawb[] = [
     topLeftCorner: [0, 0],
     dimensions: [200, 176.5250015258789],
     eyes: [
-      { pos: [53, 52.525001525878906], hit: false },
-      { pos: [144, 88.5250015258789], hit: false },
-      { pos: [86, 128.5250015258789], hit: false },
+      { pos: [53, 52.525001525878906], hitFrame: 0 },
+      { pos: [144, 88.5250015258789], hitFrame: 0 },
+      { pos: [86, 128.5250015258789], hitFrame: 0 },
     ],
   },
   {
@@ -53,10 +53,10 @@ const blobSources: Blawb[] = [
     topLeftCorner: [0, 0],
     dimensions: [314, 382.5250015258789],
     eyes: [
-      { pos: [52, 132.5250015258789], hit: false },
-      { pos: [207, 130.5250015258789], hit: false },
-      { pos: [160, 306.5250015258789], hit: false },
-      { pos: [67, 224.5250015258789], hit: false },
+      { pos: [52, 132.5250015258789], hitFrame: 0 },
+      { pos: [207, 130.5250015258789], hitFrame: 0 },
+      { pos: [160, 306.5250015258789], hitFrame: 0 },
+      { pos: [67, 224.5250015258789], hitFrame: 0 },
     ],
   },
   {
@@ -66,10 +66,10 @@ const blobSources: Blawb[] = [
     topLeftCorner: [0, 0],
     dimensions: [391, 308.1666717529297],
     eyes: [
-      { pos: [104, 151.1666717529297], hit: false },
-      { pos: [275, 138.1666717529297], hit: false },
-      { pos: [200, 243.1666717529297], hit: false },
-      { pos: [69, 205.1666717529297], hit: false },
+      { pos: [104, 151.1666717529297], hitFrame: 0 },
+      { pos: [275, 138.1666717529297], hitFrame: 0 },
+      { pos: [200, 243.1666717529297], hitFrame: 0 },
+      { pos: [69, 205.1666717529297], hitFrame: 0 },
     ],
   },
   {
@@ -79,10 +79,10 @@ const blobSources: Blawb[] = [
     topLeftCorner: [0, 0],
     dimensions: [284, 259.1666717529297],
     eyes: [
-      { pos: [77, 81.16667175292969], hit: false },
-      { pos: [223, 68.16667175292969], hit: false },
-      { pos: [192, 147.1666717529297], hit: false },
-      { pos: [81, 215.1666717529297], hit: false },
+      { pos: [77, 81.16667175292969], hitFrame: 0 },
+      { pos: [223, 68.16667175292969], hitFrame: 0 },
+      { pos: [192, 147.1666717529297], hitFrame: 0 },
+      { pos: [81, 215.1666717529297], hitFrame: 0 },
     ],
   },
   {
@@ -92,10 +92,10 @@ const blobSources: Blawb[] = [
     topLeftCorner: [0, 0],
     dimensions: [350, 327.1666717529297],
     eyes: [
-      { pos: [82, 157.1666717529297], hit: false },
-      { pos: [234, 98.16667175292969], hit: false },
-      { pos: [278, 224.1666717529297], hit: false },
-      { pos: [135, 262.1666717529297], hit: false },
+      { pos: [82, 157.1666717529297], hitFrame: 0 },
+      { pos: [234, 98.16667175292969], hitFrame: 0 },
+      { pos: [278, 224.1666717529297], hitFrame: 0 },
+      { pos: [135, 262.1666717529297], hitFrame: 0 },
     ],
   },
   {
@@ -105,10 +105,10 @@ const blobSources: Blawb[] = [
     topLeftCorner: [0, 0],
     dimensions: [246, 130.1666717529297],
     eyes: [
-      { pos: [90, 47.16667175292969], hit: false },
-      { pos: [184, 43.16667175292969], hit: false },
-      { pos: [160, 86.16667175292969], hit: false },
-      { pos: [57, 93.16667175292969], hit: false },
+      { pos: [90, 47.16667175292969], hitFrame: 0 },
+      { pos: [184, 43.16667175292969], hitFrame: 0 },
+      { pos: [160, 86.16667175292969], hitFrame: 0 },
+      { pos: [57, 93.16667175292969], hitFrame: 0 },
     ],
   },
 ]
@@ -204,6 +204,13 @@ const makeRandomBlob = (): void => {
 }
 
 setInterval(makeRandomBlob, 5000)
+type EyePropertyNames = 'eyeImages' | 'eyeImagesClosed' | 'eyeImagesScrunched'
+
+const eyePropertyArrayNames: EyePropertyNames[] = [
+  'eyeImages',
+  'eyeImagesClosed',
+  'eyeImagesScrunched',
+]
 const drawBlawb = function (blob: Blawb) {
   const topLeftX = blob.topLeftCorner[0]
   const topLeftY = blob.topLeftCorner[1]
@@ -218,11 +225,13 @@ const drawBlawb = function (blob: Blawb) {
   context.strokeStyle = '#000'
   context.lineWidth = 5
   blob.eyes.forEach(function (eye, eyeIndex) {
-    const eyePropertyArrayName = eye.hit ? 'eyeImagesClosed' : 'eyeImages'
-    const eyeImages = blawbImageGroup[eyePropertyArrayName] as HTMLImageElement[]
-    const eyeImage = eyeImages[eyeIndex] as HTMLImageElement
-    context.drawImage(eyeImage, topLeftX, topLeftY)
-    // context.fillStyle = eye.hit ? 'blue' : 'magenta'
+    const eyePropertyArrayName = eyePropertyArrayNames[eye.hitFrame]
+    if (eyePropertyArrayName) {
+      const eyeImages = blawbImageGroup[eyePropertyArrayName] as HTMLImageElement[]
+      const eyeImage = eyeImages[eyeIndex] as HTMLImageElement
+      context.drawImage(eyeImage, topLeftX, topLeftY)
+    }
+    // context.fillStyle = eye.hitFrame ? 'blue' : 'magenta'
     // context.strokeText('' + eyeIndex, topLeftX + eye.pos[0], topLeftY + eye.pos[1])
     // context.fillText('' + eyeIndex, topLeftX + eye.pos[0], topLeftY + eye.pos[1])
   })
@@ -242,8 +251,8 @@ const loadImagePromise = function (image: HTMLImageElement) {
   })
 }
 const imagePromises = images.map(loadImagePromise)
-const isEyeHit = (eye: Eye) => eye.hit
-const isBlobAlive = (blob: Blawb) => !blob.eyes.every(isEyeHit)
+const isEyeGone = (eye: Eye) => eye.hitFrame > 2
+const isBlobAlive = (blob: Blawb) => !blob.eyes.every(isEyeGone)
 
 let lastTime = 0
 const renderLoop = (time: number): void => {
@@ -309,11 +318,17 @@ const drawXAtMouse = function (evt: MouseEvent) {
   blobs.forEach((blob) => {
     blob.eyes.forEach(function (eye) {
       const eyePosition = vertexAdd(blob.topLeftCorner, eye.pos)
-      if (eye.hit || !hitTest(mouseVertex, eyePosition, 20)) {
+      if (eye.hitFrame || !hitTest(mouseVertex, eyePosition, 20)) {
         return
       }
       // console.log('which eye did we click on', eye, eyeIndex);
-      eye.hit = true
+      eye.hitFrame = 1
+      setTimeout(() => {
+        eye.hitFrame = 2
+      }, 100)
+      setTimeout(() => {
+        eye.hitFrame = 3
+      }, 300)
     })
   })
 }
