@@ -28,10 +28,10 @@ const blobSources: Blawb[] = [
     topLeftCorner: [0, 0],
     dimensions: [226, 206.5250015258789],
     eyes: [
-      { pos: [146, 72.5250015258789], hit: false },
       { pos: [52, 60.525001525878906], hit: false },
-      { pos: [102, 157.5250015258789], hit: false },
+      { pos: [146, 72.5250015258789], hit: false },
       { pos: [183, 163.5250015258789], hit: false },
+      { pos: [102, 157.5250015258789], hit: false },
     ],
   },
   {
@@ -92,10 +92,10 @@ const blobSources: Blawb[] = [
     topLeftCorner: [0, 0],
     dimensions: [350, 327.1666717529297],
     eyes: [
+      { pos: [82, 157.1666717529297], hit: false },
       { pos: [234, 98.16667175292969], hit: false },
       { pos: [278, 224.1666717529297], hit: false },
       { pos: [135, 262.1666717529297], hit: false },
-      { pos: [82, 157.1666717529297], hit: false },
     ],
   },
   {
@@ -210,14 +210,21 @@ const drawBlawb = function (blob: Blawb) {
   // const width = blob.dimensions[0]
   // const height = blob.dimensions[1]
   const blawbImageGroup = blawbImageData[blob.image]
-  const image = blawbImageGroup.bodyImage as HTMLImageElement
-  context.drawImage(image, topLeftX, topLeftY)
-  context.font = '36px serif'
+  const bodyImage = blawbImageGroup.bodyImage as HTMLImageElement
+  context.drawImage(bodyImage, topLeftX, topLeftY)
+  context.font = '48px monospace'
   context.textBaseline = 'middle'
   context.textAlign = 'center'
-  blob.eyes.forEach(function (eye) {
+  context.strokeStyle = '#000'
+  context.lineWidth = 5
+  blob.eyes.forEach(function (eye, eyeIndex) {
+    const eyePropertyArrayName = eye.hit ? 'eyeImagesClosed' : 'eyeImages'
+    const eyeImages = blawbImageGroup[eyePropertyArrayName] as HTMLImageElement[]
+    const eyeImage = eyeImages[eyeIndex] as HTMLImageElement
+    context.drawImage(eyeImage, topLeftX, topLeftY)
     context.fillStyle = eye.hit ? 'blue' : 'magenta'
-    context.fillText(eye.hit ? 'x' : 'o', topLeftX + eye.pos[0], topLeftY + eye.pos[1])
+    context.strokeText('' + eyeIndex, topLeftX + eye.pos[0], topLeftY + eye.pos[1])
+    context.fillText('' + eyeIndex, topLeftX + eye.pos[0], topLeftY + eye.pos[1])
   })
   // context.lineWidth = 15
   // context.strokeStyle = 'red'
