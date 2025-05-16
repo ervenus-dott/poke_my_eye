@@ -222,9 +222,9 @@ const drawBlawb = function (blob: Blawb) {
     const eyeImages = blawbImageGroup[eyePropertyArrayName] as HTMLImageElement[]
     const eyeImage = eyeImages[eyeIndex] as HTMLImageElement
     context.drawImage(eyeImage, topLeftX, topLeftY)
-    context.fillStyle = eye.hit ? 'blue' : 'magenta'
-    context.strokeText('' + eyeIndex, topLeftX + eye.pos[0], topLeftY + eye.pos[1])
-    context.fillText('' + eyeIndex, topLeftX + eye.pos[0], topLeftY + eye.pos[1])
+    // context.fillStyle = eye.hit ? 'blue' : 'magenta'
+    // context.strokeText('' + eyeIndex, topLeftX + eye.pos[0], topLeftY + eye.pos[1])
+    // context.fillText('' + eyeIndex, topLeftX + eye.pos[0], topLeftY + eye.pos[1])
   })
   // context.lineWidth = 15
   // context.strokeStyle = 'red'
