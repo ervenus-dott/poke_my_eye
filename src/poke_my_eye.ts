@@ -158,13 +158,13 @@ type BlawbImageData = {
   eyeImagesScrunched?: HTMLImageElement[]
 }
 const blawbImageData: BlawbImageData[] = [
-  { prefix: '/eye-blob-groups/green_yellow_blue-eyes/', eyeCount: 4 },
-  { prefix: '/eye-blob-groups/green_yellow_blue_three-eyes/', eyeCount: 3 },
-  { prefix: '/eye-blob-groups/light-blue_magenta_blue-eyes/', eyeCount: 4 },
-  { prefix: '/eye-blob-groups/light-blue_yellow_magenta-eyes/', eyeCount: 4 },
-  { prefix: '/eye-blob-groups/orange_magenta_blue-eyes/', eyeCount: 4 },
-  { prefix: '/eye-blob-groups/orange_yellow_blue-eyes/', eyeCount: 4 },
-  { prefix: '/eye-blob-groups/red_magenta_blue-eyes/', eyeCount: 4 },
+  { prefix: 'eye-blob-groups/green_yellow_blue-eyes/', eyeCount: 4 },
+  { prefix: 'eye-blob-groups/green_yellow_blue_three-eyes/', eyeCount: 3 },
+  { prefix: 'eye-blob-groups/light-blue_magenta_blue-eyes/', eyeCount: 4 },
+  { prefix: 'eye-blob-groups/light-blue_yellow_magenta-eyes/', eyeCount: 4 },
+  { prefix: 'eye-blob-groups/orange_magenta_blue-eyes/', eyeCount: 4 },
+  { prefix: 'eye-blob-groups/orange_yellow_blue-eyes/', eyeCount: 4 },
+  { prefix: 'eye-blob-groups/red_magenta_blue-eyes/', eyeCount: 4 },
 ]
 const makeImageFromPath = (imagePath: string): HTMLImageElement => {
   const image = new Image()
@@ -210,7 +210,6 @@ const makeRandomBlob = (): void => {
   blobCounter(true)
 }
 
-setInterval(makeRandomBlob, 5000)
 type EyePropertyNames = 'eyeImages' | 'eyeImagesClosed' | 'eyeImagesScrunched'
 
 const eyePropertyArrayNames: EyePropertyNames[] = [
@@ -294,6 +293,7 @@ const startGame = () => {
   const audioPromises = Object.values(sfx).map(loadAudioPromise)
   Promise.all([...imagePromises, ...audioPromises]).then(function () {
     startGameButton.innerText = 'loaded'
+    setInterval(makeRandomBlob, 5000)
     makeRandomBlob()
     requestAnimationFrame(renderLoop)
   })
