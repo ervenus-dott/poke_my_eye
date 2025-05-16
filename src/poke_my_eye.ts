@@ -1,13 +1,6 @@
 import './styles.css'
 const canvas: HTMLCanvasElement = document.getElementById('eye-canvas') as HTMLCanvasElement
 const context = canvas.getContext('2d') as CanvasRenderingContext2D
-const greenNormal = document.getElementById('green-normal') as HTMLImageElement
-const greenThree = document.getElementById('green-3') as HTMLImageElement
-const lightBlueMagentaBlue = document.getElementById('light-blue-magenta-blue') as HTMLImageElement
-const lightBlueYellowBlue = document.getElementById('light-blue-yellow-blue') as HTMLImageElement
-const orangeMagentaBlue = document.getElementById('orange-magenta-blue') as HTMLImageElement
-const orangeYellowBlue = document.getElementById('orange-yellow-blue') as HTMLImageElement
-const redBlob = document.getElementById('red-blob') as HTMLImageElement
 const blobCounterText = document.getElementById('blob-count') as HTMLElement
 const scoreText = document.getElementById('score') as HTMLElement
 
@@ -16,7 +9,6 @@ type Eye = {
   pos: Vec2
   hit: boolean
 }
-
 type Blawb = {
   name: string
   image: number
@@ -26,15 +18,8 @@ type Blawb = {
   eyes: Eye[]
 }
 
-const images: HTMLImageElement[] = [
-  greenNormal,
-  greenThree,
-  lightBlueMagentaBlue,
-  lightBlueYellowBlue,
-  orangeMagentaBlue,
-  orangeYellowBlue,
-  redBlob,
-]
+const images: HTMLImageElement[] = []
+
 const blobSources: Blawb[] = [
   {
     name: 'greenNormal',
@@ -156,6 +141,55 @@ const blobCounter = (blobBoolean: boolean) => {
   context.strokeRect(0, 0, width, height)
 }
 drawImageForDimensionTesting(246, 130.1666717529297)*/
+
+type BlawbImageData = {
+  prefix: string
+  eyeCount: number
+  bodyImage?: HTMLImageElement
+  eyeImages?: HTMLImageElement[]
+  eyeImagesClosed?: HTMLImageElement[]
+  eyeImagesScrunched?: HTMLImageElement[]
+}
+const blawbImageData: BlawbImageData[] = [
+  { prefix: '/eye-blob-groups/green_yellow_blue-eyes/', eyeCount: 4 },
+  { prefix: '/eye-blob-groups/green_yellow_blue_three-eyes/', eyeCount: 3 },
+  { prefix: '/eye-blob-groups/light-blue_magenta_blue-eyes/', eyeCount: 4 },
+  { prefix: '/eye-blob-groups/light-blue_yellow_magenta-eyes/', eyeCount: 4 },
+  { prefix: '/eye-blob-groups/orange_magenta_blue-eyes/', eyeCount: 4 },
+  { prefix: '/eye-blob-groups/orange_yellow_blue-eyes/', eyeCount: 4 },
+  { prefix: '/eye-blob-groups/red_magenta_blue-eyes/', eyeCount: 4 },
+]
+const makeImageFromPath = (imagePath: string): HTMLImageElement => {
+  const image = new Image()
+  image.src = imagePath
+  return image
+}
+const preloadImages = function () {
+  blawbImageData.forEach((imageGroup) => {
+    const prefix = imageGroup.prefix
+    const eyeCount = imageGroup.eyeCount
+    const bodyImage = makeImageFromPath(prefix + 'body.png')
+    images.push(bodyImage)
+    imageGroup.bodyImage = bodyImage
+    imageGroup.eyeImages = []
+    imageGroup.eyeImagesClosed = []
+    imageGroup.eyeImagesScrunched = []
+    for (let eyeIndex = 0; eyeIndex < eyeCount; eyeIndex += 1) {
+      let image = makeImageFromPath(prefix + `eye-${eyeIndex}.png`)
+      images.push(image)
+      imageGroup.eyeImages.push(image)
+      image = makeImageFromPath(prefix + `eye-${eyeIndex}-closed.png`)
+      images.push(image)
+      imageGroup.eyeImagesClosed.push(image)
+      image = makeImageFromPath(prefix + `eye-${eyeIndex}-scrunched.png`)
+      images.push(image)
+      imageGroup.eyeImagesScrunched.push(image)
+    }
+  })
+  console.log('what is blawbImageData', blawbImageData)
+}
+preloadImages()
+
 const jsonClone = (src: object): object => JSON.parse(JSON.stringify(src))
 let blobs: Blawb[] = []
 const makeRandomBlob = (): void => {
@@ -170,12 +204,13 @@ const makeRandomBlob = (): void => {
 }
 
 setInterval(makeRandomBlob, 5000)
-const drawBlobCoords = function (blob: Blawb) {
+const drawBlawb = function (blob: Blawb) {
   const topLeftX = blob.topLeftCorner[0]
   const topLeftY = blob.topLeftCorner[1]
   // const width = blob.dimensions[0]
   // const height = blob.dimensions[1]
-  const image = images[blob.image]
+  const blawbImageGroup = blawbImageData[blob.image]
+  const image = blawbImageGroup.bodyImage as HTMLImageElement
   context.drawImage(image, topLeftX, topLeftY)
   context.font = '36px serif'
   context.textBaseline = 'middle'
@@ -216,7 +251,7 @@ const renderLoop = (time: number): void => {
     // const blobPhase = (phase + blob.phase) * blob.speed
     bounce(blob, delta)
   })
-  blobs.forEach(drawBlobCoords)
+  blobs.forEach(drawBlawb)
   lastTime = time
 }
 Promise.all(imagePromises).then(function () {
