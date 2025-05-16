@@ -3,6 +3,7 @@ const canvas: HTMLCanvasElement = document.getElementById('eye-canvas') as HTMLC
 const context = canvas.getContext('2d') as CanvasRenderingContext2D
 const blobCounterText = document.getElementById('blob-count') as HTMLElement
 const scoreText = document.getElementById('score') as HTMLElement
+const startGameButton = document.getElementById('start-game') as HTMLButtonElement
 
 type Vec2 = [number, number]
 type Eye = {
@@ -19,6 +20,10 @@ type Blawb = {
 }
 
 const images: HTMLImageElement[] = []
+const sfx: Record<string, HTMLAudioElement> = {
+  squish0: new Audio('sfx/squish0.mp3'),
+  blobDeath: new Audio('sfx/blob_death.mp3'),
+}
 
 const blobSources: Blawb[] = [
   {
@@ -130,6 +135,8 @@ const blobCounter = (blobBoolean: boolean) => {
     updateBlobText()
     score += Math.ceil(Math.random() * 60 + 20)
     updateScoreText()
+    sfx.blobDeath.volume = 0.25
+    sfx.blobDeath.play()
     // console.log('what is blobCount', blobCount)
     // console.log('what is score', score)
   }
@@ -250,6 +257,16 @@ const loadImagePromise = function (image: HTMLImageElement) {
     }
   })
 }
+const loadAudioPromise = function (audio: HTMLAudioElement) {
+  audio.volume = 0
+  return new Promise<void>((resolve) => {
+    audio.addEventListener('ended', () => {
+      audio.volume = 1
+      resolve()
+    })
+    audio.play()
+  })
+}
 const imagePromises = images.map(loadImagePromise)
 const isEyeGone = (eye: Eye) => eye.hitFrame > 2
 const isBlobAlive = (blob: Blawb) => !blob.eyes.every(isEyeGone)
@@ -270,11 +287,18 @@ const renderLoop = (time: number): void => {
   blobs.forEach(drawBlawb)
   lastTime = time
 }
-Promise.all(imagePromises).then(function () {
-  makeRandomBlob()
-  requestAnimationFrame(renderLoop)
-})
-
+const startGame = () => {
+  startGameButton.disabled = true
+  startGameButton.innerText = 'loading'
+  // cant start loading audio until user has interacted with page
+  const audioPromises = Object.values(sfx).map(loadAudioPromise)
+  Promise.all([...imagePromises, ...audioPromises]).then(function () {
+    startGameButton.innerText = 'loaded'
+    makeRandomBlob()
+    requestAnimationFrame(renderLoop)
+  })
+}
+startGameButton.addEventListener('click', startGame)
 function getMousePos(canvas: HTMLCanvasElement, evt: MouseEvent) {
   const rect = canvas.getBoundingClientRect()
   return {
@@ -322,6 +346,7 @@ const drawXAtMouse = function (evt: MouseEvent) {
         return
       }
       // console.log('which eye did we click on', eye, eyeIndex);
+      sfx.squish0.play()
       eye.hitFrame = 1
       setTimeout(() => {
         eye.hitFrame = 2
