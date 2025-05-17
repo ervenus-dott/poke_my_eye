@@ -140,6 +140,30 @@ const updateHealthText = function () {
 }
 updateScoreText()
 updateHealthText()
+const tau: number = Math.PI * 2
+const triangleSize: number = 50
+const spikeSpacing: number = tau / 3
+const centerPosition = [canvas.width / 2, canvas.height / 2]
+const triangleCenterPos = [centerPosition[0] - canvas.width * 0.02, centerPosition[1]]
+context.beginPath()
+context.font = '50px monospace'
+context.textBaseline = 'middle'
+context.textAlign = 'center'
+context.lineWidth = 5
+context.strokeStyle = '#2bb393'
+context.fillStyle = '#2bb393'
+context.fillText('Click Triangle', centerPosition[0], centerPosition[1] - canvas.height * 0.2)
+context.fillText('to Start Game', centerPosition[0], centerPosition[1] + canvas.height * 0.2)
+for (let i = 0; i < 3; i++) {
+  const spikeAngle = i * spikeSpacing
+  context.lineTo(
+    triangleCenterPos[0] + Math.cos(spikeAngle) * triangleSize,
+    triangleCenterPos[1] + Math.sin(spikeAngle) * triangleSize,
+  )
+}
+context.closePath()
+context.fill()
+
 const blobCounter = (blobBoolean: boolean) => {
   if (blobBoolean) {
     blobCount += 1
@@ -369,7 +393,7 @@ const hitTest = function (a: Vec2, b: Vec2, radius: number) {
 const drawXAtMouse = function (evt: MouseEvent) {
   const pos = getMousePos(canvas, evt)
   const mouseVertex: Vec2 = [pos.x, pos.y]
-  // console.log('what is pos.x and pos.y', pos.x, ',', pos.y)
+  console.log('what is pos.x and pos.y', pos.x, ',', pos.y)
   blobs.forEach((blob) => {
     blob.eyes.forEach(function (eye) {
       const eyePosition = vertexAdd(blob.topLeftCorner, eye.pos)
