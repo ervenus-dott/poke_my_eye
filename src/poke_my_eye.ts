@@ -3,6 +3,7 @@ const canvas: HTMLCanvasElement = document.getElementById('eye-canvas') as HTMLC
 const context = canvas.getContext('2d') as CanvasRenderingContext2D
 const blobCounterText = document.getElementById('blob-count') as HTMLElement
 const scoreText = document.getElementById('score') as HTMLElement
+const healthText = document.getElementById('health') as HTMLElement
 const startGameButton = document.getElementById('start-game') as HTMLButtonElement
 
 type Vec2 = [number, number]
@@ -13,6 +14,7 @@ type Eye = {
 type Blawb = {
   name: string
   image: number
+  spawnTimer: number
   velocity: Vec2
   topLeftCorner: Vec2
   dimensions: Vec2
@@ -29,6 +31,7 @@ const blobSources: Blawb[] = [
   {
     name: 'greenNormal',
     image: 0,
+    spawnTimer: 0,
     velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [226, 206.5250015258789],
@@ -42,6 +45,7 @@ const blobSources: Blawb[] = [
   {
     name: 'greenThree',
     image: 1,
+    spawnTimer: 0,
     velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [200, 176.5250015258789],
@@ -54,6 +58,7 @@ const blobSources: Blawb[] = [
   {
     name: 'lightBlueMagentaBlue',
     image: 2,
+    spawnTimer: 0,
     velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [314, 382.5250015258789],
@@ -67,6 +72,7 @@ const blobSources: Blawb[] = [
   {
     name: 'lightBlueYellowBlue',
     image: 3,
+    spawnTimer: 0,
     velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [391, 308.1666717529297],
@@ -80,6 +86,7 @@ const blobSources: Blawb[] = [
   {
     name: 'orangeMagentaBlue',
     image: 4,
+    spawnTimer: 0,
     velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [284, 259.1666717529297],
@@ -93,6 +100,7 @@ const blobSources: Blawb[] = [
   {
     name: 'orangeYellowBlue',
     image: 5,
+    spawnTimer: 0,
     velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [350, 327.1666717529297],
@@ -106,6 +114,7 @@ const blobSources: Blawb[] = [
   {
     name: 'redBlob',
     image: 6,
+    spawnTimer: 0,
     velocity: [0, 0],
     topLeftCorner: [0, 0],
     dimensions: [246, 130.1666717529297],
@@ -119,12 +128,18 @@ const blobSources: Blawb[] = [
 ]
 let blobCount: number = 0
 let score: number = 0
+let health: number = 1000
 const updateBlobText = function () {
   blobCounterText.innerText = blobCount + ' blobs'
 }
 const updateScoreText = function () {
   scoreText.innerText = 'score is: ' + score
 }
+const updateHealthText = function () {
+  healthText.innerText = 'health is: ' + health
+}
+updateScoreText()
+updateHealthText()
 const blobCounter = (blobBoolean: boolean) => {
   if (blobBoolean) {
     blobCount += 1
@@ -133,6 +148,7 @@ const blobCounter = (blobBoolean: boolean) => {
   } else {
     blobCount -= 1
     updateBlobText()
+    updateHealthText()
     score += Math.ceil(Math.random() * 60 + 20)
     updateScoreText()
     sfx.blobDeath.volume = 0.25
@@ -203,6 +219,7 @@ const makeRandomBlob = (): void => {
   const index = Math.floor(Math.random() * blobSources.length)
   const sourceBlob = blobSources[index]
   const clonedBlob = jsonClone(sourceBlob) as Blawb
+  clonedBlob.spawnTimer = 1000
   clonedBlob.velocity = vertexScale([Math.random() * 2 - 1, Math.random() * 2 - 1], 100)
   clonedBlob.topLeftCorner[0] = Math.random() * (canvas.width - clonedBlob.dimensions[0])
   clonedBlob.topLeftCorner[1] = Math.random() * (canvas.height - clonedBlob.dimensions[1])
@@ -269,6 +286,9 @@ const loadAudioPromise = function (audio: HTMLAudioElement) {
 const imagePromises = images.map(loadImagePromise)
 const isEyeGone = (eye: Eye) => eye.hitFrame > 2
 const isBlobAlive = (blob: Blawb) => !blob.eyes.every(isEyeGone)
+const shouldBlobDespawn = (blob: Blawb) => {
+  return blob.spawnTimer > 0
+}
 
 let lastTime = 0
 const renderLoop = (time: number): void => {
@@ -279,10 +299,21 @@ const renderLoop = (time: number): void => {
   if (blobCount > blobs.length) {
     blobCounter(false)
   }
+  if (score < -100) {
+    health -= 1
+    updateHealthText()
+  }
   blobs.forEach((blob) => {
     // const blobPhase = (phase + blob.phase) * blob.speed
+    blob.spawnTimer -= 1
+    if (blob.spawnTimer < 1) {
+      score -= 100
+    }
+    // console.log(`what is ${blob.name}'s spawn timer?:`, blob.spawnTimer)
     bounce(blob, delta)
   })
+  blobs = blobs.filter(shouldBlobDespawn)
+  // blobs = blobs.filter(shouldBlobDespawn)
   blobs.forEach(drawBlawb)
   lastTime = time
 }
@@ -294,7 +325,7 @@ const startGame = () => {
   Promise.all([...imagePromises, ...audioPromises]).then(function () {
     startGameButton.innerText = 'loaded'
     setInterval(makeRandomBlob, 5000)
-    makeRandomBlob()
+    // makeRandomBlob()
     requestAnimationFrame(renderLoop)
   })
 }
