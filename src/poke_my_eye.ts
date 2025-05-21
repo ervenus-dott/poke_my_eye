@@ -132,10 +132,16 @@ const updateBlobText = function () {
   blobCounterText.innerText = blobCount + ' blobs'
 }
 const updateScoreText = function () {
-  scoreText.innerText = 'score is: ' + score
+  const value = String(score)
+  if (scoreText.innerText !== value) {
+    scoreText.innerText = value
+  }
 }
 const updateHealthText = function () {
-  healthText.innerText = 'health is: ' + health
+  const value = String(health)
+  if (healthText.innerText !== value) {
+    healthText.innerText = value
+  }
 }
 updateScoreText()
 updateHealthText()
@@ -165,24 +171,54 @@ const drawStartScreen = function () {
   context.closePath()
   context.fill()
 }
+const drawLoadingScreen = function () {
+  context.clearRect(0, 0, canvas.width, canvas.height)
+  context.beginPath()
+  context.font = '50px monospace'
+  context.textBaseline = 'middle'
+  context.textAlign = 'center'
+  context.lineWidth = 5
+  context.strokeStyle = '#2bb393'
+  context.fillStyle = '#2bb393'
+  context.fillText('Game is Loading', centerPosition[0], centerPosition[1] - canvas.height * 0.2)
+  context.fillText('Please Wait', centerPosition[0], centerPosition[1] + canvas.height * 0.2)
+  context.closePath()
+  context.fill()
+}
+const drawEndScreen = function () {
+  context.clearRect(0, 0, canvas.width, canvas.height)
+  context.beginPath()
+  context.font = 'bold 50px monospace'
+  context.textBaseline = 'middle'
+  context.textAlign = 'center'
+  context.lineWidth = 5
+  context.strokeStyle = '#ff0000'
+  context.fillStyle = '#ff0000'
+  context.fillText('GAME', centerPosition[0], centerPosition[1] - canvas.height * 0.05)
+  context.fillText('OVER', centerPosition[0], centerPosition[1] + canvas.height * 0.05)
+  context.fillText(
+    `score was ${Math.max(0, score)}`,
+    centerPosition[0],
+    centerPosition[1] + canvas.height * 0.1,
+  )
 
+  context.closePath()
+  context.fill()
+}
 drawStartScreen()
+
 const blobCounter = (blobBoolean: boolean) => {
   if (blobBoolean) {
     blobCount += 1
-    updateBlobText()
     // console.log('what is blobCount', blobCount)
   } else {
     blobCount -= 1
-    updateBlobText()
-    updateHealthText()
-    score += Math.ceil(Math.random() * 60 + 20)
-    updateScoreText()
     sfx.blobDeath.volume = 0.25
     sfx.blobDeath.play()
     // console.log('what is blobCount', blobCount)
     // console.log('what is score', score)
   }
+  updateBlobText()
 }
 /*const drawImageForDimensionTesting = (width: number, height: number) => {
     context.drawImage(redBlob, 0, 0)
@@ -312,34 +348,41 @@ const loadAudioPromise = function (audio: HTMLAudioElement) {
 }
 const imagePromises = images.map(loadImagePromise)
 const isEyeGone = (eye: Eye) => eye.hitFrame > 2
-const isBlobAlive = (blob: Blawb) => !blob.eyes.every(isEyeGone)
-const shouldBlobDespawn = (blob: Blawb) => {
-  return blob.spawnTimer > 0
+const blobHasTime = (blob: Blawb) => {
+  const isAlive = blob.spawnTimer > 0
+  if (!isAlive) {
+    health -= 100
+  }
+  return isAlive
 }
-
+const isBlobAlive = (blob: Blawb) => !blob.eyes.every(isEyeGone) && blobHasTime(blob)
+let isRunning = true
 let lastTime = 0
+let spawnBlobTicker: number
 const renderLoop = (time: number): void => {
+  if (isRunning) {
+    requestAnimationFrame(renderLoop)
+  }
   const delta = (lastTime - time) / 1000
-  requestAnimationFrame(renderLoop)
+  updateHealthText()
+  updateScoreText()
+  if (health <= 0) {
+    isRunning = false
+    clearInterval(spawnBlobTicker)
+    drawEndScreen()
+    return
+  }
   context.clearRect(0, 0, canvas.width, canvas.height)
   blobs = blobs.filter(isBlobAlive)
   if (blobCount > blobs.length) {
     blobCounter(false)
   }
-  if (score < -100) {
-    health -= 1
-    updateHealthText()
-  }
   blobs.forEach((blob) => {
     // const blobPhase = (phase + blob.phase) * blob.speed
     blob.spawnTimer -= 1
-    if (blob.spawnTimer < 1) {
-      score -= 100
-    }
     // console.log(`what is ${blob.name}'s spawn timer?:`, blob.spawnTimer)
     bounce(blob, delta)
   })
-  blobs = blobs.filter(shouldBlobDespawn)
   // blobs = blobs.filter(shouldBlobDespawn)
   blobs.forEach(drawBlawb)
   lastTime = time
@@ -349,12 +392,12 @@ const startGame = () => {
   // startGameButton.disabled = true
   // startGameButton.innerText = 'loading'
   // cant start loading audio until user has interacted with page
-  drawStartScreen()
+  drawLoadingScreen()
   const audioPromises = Object.values(sfx).map(loadAudioPromise)
   Promise.all([...imagePromises, ...audioPromises]).then(function () {
     // startGameButton.innerText = 'loaded'
-    setInterval(makeRandomBlob, 5000)
-    // makeRandomBlob()
+    makeRandomBlob()
+    spawnBlobTicker = setInterval(makeRandomBlob, 5000)
     requestAnimationFrame(renderLoop)
   })
 }
@@ -397,7 +440,7 @@ const hitTest = function (a: Vec2, b: Vec2, radius: number) {
   return distance <= radius
 }
 let wasStarted: boolean = false
-const drawXAtMouse = function (evt: MouseEvent) {
+const collideMouseClickWithEyes = function (evt: MouseEvent) {
   const pos = getMousePos(canvas, evt)
   const mouseVertex: Vec2 = [pos.x, pos.y]
   if (hitTest(mouseVertex, triangleCenterPos, triangleSize) && !wasStarted) {
@@ -413,6 +456,10 @@ const drawXAtMouse = function (evt: MouseEvent) {
         return
       }
       // console.log('which eye did we click on', eye, eyeIndex);
+      score += 5
+      if (isBlobAlive(blob)) {
+        score += 10
+      }
       sfx.squish0.play()
       eye.hitFrame = 1
       setTimeout(() => {
@@ -424,4 +471,4 @@ const drawXAtMouse = function (evt: MouseEvent) {
     })
   })
 }
-canvas.addEventListener('mousedown', drawXAtMouse)
+canvas.addEventListener('mousedown', collideMouseClickWithEyes)
