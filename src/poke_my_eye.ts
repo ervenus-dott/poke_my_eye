@@ -4,7 +4,6 @@ const context = canvas.getContext('2d') as CanvasRenderingContext2D
 const blobCounterText = document.getElementById('blob-count') as HTMLElement
 const scoreText = document.getElementById('score') as HTMLElement
 const healthText = document.getElementById('health') as HTMLElement
-const startGameButton = document.getElementById('start-game') as HTMLButtonElement
 
 type Vec2 = [number, number]
 type Eye = {
@@ -143,27 +142,31 @@ updateHealthText()
 const tau: number = Math.PI * 2
 const triangleSize: number = 50
 const spikeSpacing: number = tau / 3
-const centerPosition = [canvas.width / 2, canvas.height / 2]
-const triangleCenterPos = [centerPosition[0] - canvas.width * 0.02, centerPosition[1]]
-context.beginPath()
-context.font = '50px monospace'
-context.textBaseline = 'middle'
-context.textAlign = 'center'
-context.lineWidth = 5
-context.strokeStyle = '#2bb393'
-context.fillStyle = '#2bb393'
-context.fillText('Click Triangle', centerPosition[0], centerPosition[1] - canvas.height * 0.2)
-context.fillText('to Start Game', centerPosition[0], centerPosition[1] + canvas.height * 0.2)
-for (let i = 0; i < 3; i++) {
-  const spikeAngle = i * spikeSpacing
-  context.lineTo(
-    triangleCenterPos[0] + Math.cos(spikeAngle) * triangleSize,
-    triangleCenterPos[1] + Math.sin(spikeAngle) * triangleSize,
-  )
-}
-context.closePath()
-context.fill()
+const centerPosition: Vec2 = [canvas.width / 2, canvas.height / 2]
+const triangleCenterPos: Vec2 = [centerPosition[0] - canvas.width * 0.02, centerPosition[1]]
+const drawStartScreen = function () {
+  context.beginPath()
+  context.font = '50px monospace'
+  context.textBaseline = 'middle'
+  context.textAlign = 'center'
+  context.lineWidth = 5
+  context.strokeStyle = '#2bb393'
+  context.fillStyle = '#2bb393'
+  context.fillText('Click Triangle', centerPosition[0], centerPosition[1] - canvas.height * 0.2)
+  context.fillText('to Start Game', centerPosition[0], centerPosition[1] + canvas.height * 0.2)
+  for (let i = 0; i < 3; i++) {
+    const spikeAngle = i * spikeSpacing
+    context.lineTo(
+      triangleCenterPos[0] + Math.cos(spikeAngle) * triangleSize,
+      triangleCenterPos[1] + Math.sin(spikeAngle) * triangleSize,
+    )
+  }
 
+  context.closePath()
+  context.fill()
+}
+
+drawStartScreen()
 const blobCounter = (blobBoolean: boolean) => {
   if (blobBoolean) {
     blobCount += 1
@@ -182,12 +185,12 @@ const blobCounter = (blobBoolean: boolean) => {
   }
 }
 /*const drawImageForDimensionTesting = (width: number, height: number) => {
-  context.drawImage(redBlob, 0, 0)
-  context.lineWidth = 15
-  context.strokeStyle = 'red'
-  context.strokeRect(0, 0, width, height)
-}
-drawImageForDimensionTesting(246, 130.1666717529297)*/
+    context.drawImage(redBlob, 0, 0)
+    context.lineWidth = 15
+    context.strokeStyle = 'red'
+    context.strokeRect(0, 0, width, height)
+  }
+  drawImageForDimensionTesting(246, 130.1666717529297)*/
 
 type BlawbImageData = {
   prefix: string
@@ -341,19 +344,22 @@ const renderLoop = (time: number): void => {
   blobs.forEach(drawBlawb)
   lastTime = time
 }
+// TODO: Create loading screen once start button is pressed
 const startGame = () => {
-  startGameButton.disabled = true
-  startGameButton.innerText = 'loading'
+  // startGameButton.disabled = true
+  // startGameButton.innerText = 'loading'
   // cant start loading audio until user has interacted with page
+  drawStartScreen()
   const audioPromises = Object.values(sfx).map(loadAudioPromise)
   Promise.all([...imagePromises, ...audioPromises]).then(function () {
-    startGameButton.innerText = 'loaded'
+    // startGameButton.innerText = 'loaded'
     setInterval(makeRandomBlob, 5000)
     // makeRandomBlob()
     requestAnimationFrame(renderLoop)
   })
 }
-startGameButton.addEventListener('click', startGame)
+
+// startGameButton.addEventListener('click', startGame)
 function getMousePos(canvas: HTMLCanvasElement, evt: MouseEvent) {
   const rect = canvas.getBoundingClientRect()
   return {
@@ -363,6 +369,7 @@ function getMousePos(canvas: HTMLCanvasElement, evt: MouseEvent) {
     clientY: evt.clientY,
   }
 }
+
 const vertexAdd = (a: Vec2, b: Vec2): Vec2 => {
   return [a[0] + b[0], a[1] + b[1]]
 }
@@ -389,11 +396,16 @@ const hitTest = function (a: Vec2, b: Vec2, radius: number) {
   const distance = vertexDistance(a, b)
   return distance <= radius
 }
-
+let wasStarted: boolean = false
 const drawXAtMouse = function (evt: MouseEvent) {
   const pos = getMousePos(canvas, evt)
   const mouseVertex: Vec2 = [pos.x, pos.y]
-  console.log('what is pos.x and pos.y', pos.x, ',', pos.y)
+  if (hitTest(mouseVertex, triangleCenterPos, triangleSize) && !wasStarted) {
+    startGame()
+    wasStarted = true
+    // console.log('Start Button hitTest successful')
+  }
+  // console.log('what is pos.x and pos.y', pos.x, ',', pos.y)
   blobs.forEach((blob) => {
     blob.eyes.forEach(function (eye) {
       const eyePosition = vertexAdd(blob.topLeftCorner, eye.pos)
