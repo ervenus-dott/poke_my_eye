@@ -24,6 +24,7 @@ const images: HTMLImageElement[] = []
 const sfx: Record<string, HTMLAudioElement> = {
   squish0: new Audio('sfx/squish0.mp3'),
   blobDeath: new Audio('sfx/blob_death.mp3'),
+  blobDespawn: new Audio('sfx/blob_despawn.mp3'),
 }
 
 const blobSources: Blawb[] = [
@@ -356,6 +357,8 @@ const blobHasTime = (blob: Blawb) => {
   const isAlive = blob.spawnTimer > 0
   if (!isAlive) {
     healthCounter -= 100
+    sfx.blobDespawn.volume = 0.25
+    sfx.blobDespawn.play()
   }
   return isAlive
 }
