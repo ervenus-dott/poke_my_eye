@@ -128,6 +128,7 @@ const blobSources: Blawb[] = [
 let blobCount: number = 0
 let score: number = 0
 let health: number = 1000
+let healthCounter: number = 1000
 const updateBlobText = function () {
   blobCounterText.innerText = blobCount + ' blobs'
 }
@@ -192,20 +193,23 @@ const drawEndScreen = function () {
   context.textBaseline = 'middle'
   context.textAlign = 'center'
   context.lineWidth = 5
-  context.strokeStyle = '#ff0000'
-  context.fillStyle = '#ff0000'
-  context.fillText('GAME', centerPosition[0], centerPosition[1] - canvas.height * 0.05)
-  context.fillText('OVER', centerPosition[0], centerPosition[1] + canvas.height * 0.05)
+  context.fillStyle = '#c30000'
+  context.strokeStyle = '#c30000'
+  context.fillText('GAME OVER', centerPosition[0], centerPosition[1] - canvas.height * 0.05)
+  context.font = '30px monospace'
+  context.strokeStyle = '#000000'
+  // context.fillText('', centerPosition[0], centerPosition[1] + canvas.height * 0.05)
   context.fillText(
     `score was ${Math.max(0, score)}`,
     centerPosition[0],
-    centerPosition[1] + canvas.height * 0.1,
+    centerPosition[1] + canvas.height * 0.05,
   )
 
   context.closePath()
   context.fill()
 }
 drawStartScreen()
+// drawEndScreen()
 
 const blobCounter = (blobBoolean: boolean) => {
   if (blobBoolean) {
@@ -351,7 +355,7 @@ const isEyeGone = (eye: Eye) => eye.hitFrame > 2
 const blobHasTime = (blob: Blawb) => {
   const isAlive = blob.spawnTimer > 0
   if (!isAlive) {
-    health -= 100
+    healthCounter -= 100
   }
   return isAlive
 }
@@ -366,6 +370,9 @@ const renderLoop = (time: number): void => {
   const delta = (lastTime - time) / 1000
   updateHealthText()
   updateScoreText()
+  if (healthCounter < health) {
+    health -= 1
+  }
   if (health <= 0) {
     isRunning = false
     clearInterval(spawnBlobTicker)
