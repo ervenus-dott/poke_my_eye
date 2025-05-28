@@ -128,6 +128,7 @@ const blobSources: Blawb[] = [
 ]
 let blobCount: number = 0
 let score: number = 0
+let scoreCounter: number = 0
 let health: number = 1000
 let healthCounter: number = 1000
 const updateBlobText = function () {
@@ -376,6 +377,9 @@ const renderLoop = (time: number): void => {
   if (healthCounter < health) {
     health -= 1
   }
+  if (score < scoreCounter) {
+    score += 1
+  }
   if (health <= 0) {
     isRunning = false
     clearInterval(spawnBlobTicker)
@@ -465,11 +469,8 @@ const collideMouseClickWithEyes = function (evt: MouseEvent) {
       if (eye.hitFrame || !hitTest(mouseVertex, eyePosition, 20)) {
         return
       }
-      // console.log('which eye did we click on', eye, eyeIndex);
-      score += 5
-      if (isBlobAlive(blob)) {
-        score += 10
-      }
+      // console.log('which eye did we click on', eye, eyeIndex)
+      scoreCounter += 5
       sfx.squish0.play()
       eye.hitFrame = 1
       setTimeout(() => {
@@ -477,6 +478,9 @@ const collideMouseClickWithEyes = function (evt: MouseEvent) {
       }, 100)
       setTimeout(() => {
         eye.hitFrame = 3
+        if (!isBlobAlive(blob)) {
+          scoreCounter += 10
+        }
       }, 300)
     })
   })
